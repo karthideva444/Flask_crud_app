@@ -1,0 +1,33 @@
+For localhost flask server its exposed in the port of 5000
+
+step1: Create a separate folder with required components (index page,create page,edit page) in html format and style sheets as required.
+
+step2: Name the inputs in the html form like firstname,lastname,address,email and phone number.Edit the each pages with the required fields and add buttons in the form as create,edit,delete.
+
+step3: Create a app.py file and open the root folder in the terminal and create a virtualenv as venv        (optional) but recommended and install all the packages required for the project by using requirements.txt file.
+
+step4: Add sqlite db for simplity usecase and mention it the app.py and add the security_key in that recommended to use it with .env for simplity it is added directly.
+
+step5: Create a User Models for the requirements as mentioned for the db with the simple validations like unique and limited characters as per the no.of.fields required for the the usecase.
+
+step6: Add admin panel for admin usecase if needed ( Recommended for prod app )
+
+step 7: Create a diffrent types of routes and in first create a home route with "/" for home page access 
+and add methods "GET" and "POST" and get the data from the front end html form and do neccessary validation
+like phone_number must not be less than 10 and email and phone_number is not repeatative.The create method 
+has try except blocks for avoid the error exception.
+
+step8: Then if the input passes all the validations in the as mentioned add the data in the db in the same time redirect the user to the home page with the data queried from the db that will be listed in the home paga as users list with a edit and delete option.
+
+step9: By clicking the Edit option it will request the data from the db with the selected data set in the create page after modifying the data.The modified data will be rendered in the home page as a user list.
+
+step10: By clicking the Delete option it will query the id of the data set and with unique id it delete the 
+data set in the db.
+
+
+Manual installed dependencies for development:
+Flask==3.0.3 --> we can use Django for better development for light weight and simplicity Flask server used.
+Flask-Admin==1.6.1 --> to view the admin panel in the prod env.
+Flask-SQLAlchemy==3.1.1 --> to connect the flask with sql lite server.
+SQLAlchemy==2.0.35 -->  Core ORM framework for database-agnostic querying and management.
+

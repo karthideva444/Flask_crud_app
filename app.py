@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+import re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -42,8 +43,17 @@ def create():
         address = request.form['address']
         # Data validation
         has_error = False
-        if len(phone_number) < 10:
-            flash('Error: Phone number must be at least 10 digits long!')
+        # Phone number validation
+        if not phone_number.isdigit():
+            flash('Error: Phone number must contain only digits!')
+            has_error = True
+        if len(phone_number) != 10:
+            flash('Error: Phone number must be exactly 10 digits long!')
+            has_error = True
+        # Email validation using regex for pattern and ".com" check
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not (re.match(email_regex, email) and email.endswith('.com')):
+            flash('Error: Invalid email format! Must end with .com')
             has_error = True
         # Save user to in-memory storage
         if not has_error:    
@@ -61,7 +71,8 @@ def create():
                 return redirect(url_for('index'))
             except IntegrityError:
                 db.session.rollback()
-                flash('Error: Phone number or email already exists!')                                           
+                flash('Error: Phone number or email already exists!')  
+                                                     
     return render_template('create.html') 
 
 # Update user
@@ -75,13 +86,36 @@ def edit(id):
     if request.method == 'POST':
         user.first_name = request.form['first_name']
         user.last_name = request.form['last_name']
-        user.phone_number = request.form['phone_number']
-        user.email = request.form['email']
+        phone_number = request.form['phone_number']
+        email = request.form['email']
         user.address = request.form['address']
-        db.session.commit()
-        flash('User updated successfully!')
-        return redirect(url_for('index'))
 
+        # Data validation
+        has_error = False
+
+        # Phone number validation
+        if not (phone_number.isdigit() and len(phone_number) == 10):
+            flash('Error: Phone number must be exactly 10 digits long and numeric!')
+            # has_error = True
+
+        # Email validation using regex for pattern and ".com" check
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not (re.match(email_regex, email) and email.endswith('.com')):
+            flash('Error: Invalid email format! Must end with .com')
+            # has_error = True
+
+        # Only commit changes if there are no errors
+        if not has_error:
+            user.phone_number = phone_number
+            user.email = email
+            try:
+                db.session.commit()
+                flash('User updated successfully!')
+                return redirect(url_for('index'))
+            except IntegrityError:
+                db.session.rollback()
+                flash('Error: Phone number or email already exists!')
+    
     return render_template('edit.html', user=user)
 
 # Delete user
@@ -97,4 +131,4 @@ def delete(id):
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0', port=5000)
